@@ -1,9 +1,11 @@
 import React, { useState, useEffect } from "react";
 import api from "../api";
 import { FavoriteBtn } from "./favoriteBtn";
+import { Arrow } from "./arrow";
 import Pagination from "./pagination";
 import { paginate } from "../utils/paginate";
 import GroupList from "./groupList";
+import _ from "lodash";
 const Users = () => {
     const [users, setUsers] = useState(api.users.fetchAll());
     const onDelete = (id) => {
@@ -13,6 +15,7 @@ const Users = () => {
     const [currentPage, setCurrentPage] = useState(1);
     const [professions, setProfessions] = useState();
     const [selectedProf, setSelectedProf] = useState([]);
+    const [sortBy, setSortBy] = useState({ iter: "name", order: "asc" });
     const count = users.length;
     const pageSize = 4;
     useEffect(() => {
@@ -39,7 +42,15 @@ const Users = () => {
         setSelectedProf([]);
     };
     const filteredUsers = selectedProf.length ? users.filter((user) => selectedProf.includes(user.profession.name)) : users;
-    const userCrop = paginate(filteredUsers, currentPage, pageSize);
+    const sortedUsers = _.orderBy(filteredUsers, [sortBy.iter], [sortBy.order]);
+    const userCrop = paginate(sortedUsers, currentPage, pageSize);
+    const onSort = (item) => {
+        if (sortBy.iter === item) {
+            setSortBy((prevState) => ({ ...prevState, order: prevState.order === "asc" ? "desc" : "asc" }));
+        } else {
+            setSortBy({ iter: item, order: "asc" });
+        }
+    };
     return (
         <div className="d-flex">
             {professions && (
@@ -68,12 +79,22 @@ const Users = () => {
 
                     <thead>
                         <tr>
-                            <th scope="col">Имя</th>
+                            <th onClick={() => { onSort("name"); }} scope="col">Имя
+                                <Arrow />
+                            </th>
                             <th scope="col">Качества</th>
-                            <th scope="col">Профессия</th>
-                            <th scope="col">Встретился, раз</th>
-                            <th scope="col">Оценка</th>
-                            <th csope="col">Избранное</th>
+                            <th onClick={() => { onSort("profession.name"); }} scope="col">Профессия
+                                <Arrow />
+                            </th>
+                            <th onClick={() => { onSort("completedMeetings"); }} scope="col">Встретился, раз
+                                <Arrow />
+                            </th>
+                            <th onClick={() => { onSort("rate"); }} scope="col">Оценка
+                                <Arrow />
+                            </th>
+                            <th onClick={() => { onSort("bookmark"); }} csope="col">Избранное
+                                <Arrow />
+                            </th>
                             <th></th>
                         </tr>
                     </thead>
