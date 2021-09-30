@@ -6,6 +6,7 @@ import Pagination from "./pagination";
 import { paginate } from "../utils/paginate";
 import GroupList from "./groupList";
 import _ from "lodash";
+import { Link } from "react-router-dom";
 const Users = () => {
     const [users, setUsers] = useState(api.users.fetchAll());
     const onDelete = (id) => {
@@ -52,97 +53,104 @@ const Users = () => {
         }
     };
     return (
-        <div className="d-flex">
-            {professions && (
-                <div className="d-flex flex-column flex-shrink-0 p-3">
+        <>
 
-                    <GroupList
-                        selectedItems={selectedProf}
-                        items={professions}
-                        onItemsSelect={handleProffesionSelect}
-                    />
-                    <button className='btn btn-secondary mt-2'
-                        onClick={clearFilter}
-                    >
-                        Очистить фильр
-                    </button>
-                </div>
-            )}
+            <div className="d-flex">
+                {professions && (
+                    <div className="d-flex flex-column flex-shrink-0 p-3">
 
-            <div className="d-flex flex-column">
-                <h1>
-                    <span className="badge bg-secondary">
-                        {users?.length ? `с тобой тусует ${filteredUsers.length}` : "никого нет"}
-                    </span>
-                </h1>
-                <table className="table">
+                        <GroupList
+                            selectedItems={selectedProf}
+                            items={professions}
+                            onItemsSelect={handleProffesionSelect}
+                        />
+                        <button className='btn btn-secondary mt-2'
+                            onClick={clearFilter}
+                        >
+                            Очистить фильр
+                        </button>
+                    </div>
+                )}
 
-                    <thead>
-                        <tr>
-                            <th onClick={() => { onSort("name"); }} scope="col">Имя
-                                <Arrow />
-                            </th>
-                            <th scope="col">Качества</th>
-                            <th onClick={() => { onSort("profession.name"); }} scope="col">Профессия
-                                <Arrow />
-                            </th>
-                            <th onClick={() => { onSort("completedMeetings"); }} scope="col">Встретился, раз
-                                <Arrow />
-                            </th>
-                            <th onClick={() => { onSort("rate"); }} scope="col">Оценка
-                                <Arrow />
-                            </th>
-                            <th onClick={() => { onSort("bookmark"); }} csope="col">Избранное
-                                <Arrow />
-                            </th>
-                            <th></th>
-                        </tr>
-                    </thead>
+                <div className="d-flex flex-column">
+                    <h1>
+                        <span className="badge bg-secondary">
+                            {users?.length ? `с тобой тусует ${filteredUsers.length}` : "никого нет"}
+                        </span>
+                    </h1>
+                    <table className="table">
 
-                    <tbody>
-                        {userCrop.map((user) => (
-                            <tr key={user._id}>
-                                <td>{user.name}</td>
-                                <td>
-                                    {user.qualities.map((quality) => (
-                                        <span
-                                            className={`p-1 m-2 bg-${quality.color} text-white smallText `}
-                                            key={quality._id}
-                                        >
-                                            {quality.name}
-                                        </span>
-                                    ))}
-                                </td>
-                                <td>{user.profession.name}</td>
-                                <td>{user.completedMeetings}</td>
-                                <td>{user.rate}</td>
-                                <td>
-                                    <FavoriteBtn />
-                                </td>
-                                <td>
-                                    <button
-                                        className="badge bg-danger"
-                                        onClick={() => onDelete(user._id)}
-                                    >
-                                        delete
-                                    </button>
-                                </td>
+                        <thead>
+                            <tr>
+                                <th onClick={() => { onSort("name"); }} scope="col">Имя
+                                    <Arrow />
+                                </th>
+                                <th scope="col">Качества</th>
+                                <th onClick={() => { onSort("profession.name"); }} scope="col">Профессия
+                                    <Arrow />
+                                </th>
+                                <th onClick={() => { onSort("completedMeetings"); }} scope="col">Встретился, раз
+                                    <Arrow />
+                                </th>
+                                <th onClick={() => { onSort("rate"); }} scope="col">Оценка
+                                    <Arrow />
+                                </th>
+                                <th onClick={() => { onSort("bookmark"); }} csope="col">Избранное
+                                    <Arrow />
+                                </th>
+                                <th></th>
                             </tr>
-                        ))}
-                    </tbody>
-                </table>
-                <div className="d-flex justify-content-center">
-                    <Pagination
-                        itemsCount={count}
-                        pageSize={pageSize}
-                        currentPage={currentPage}
-                        onPageChange={handlePageChange}
-                    />
+                        </thead>
+
+                        <tbody>
+                            {userCrop.map((user) => (
+                                <tr key={user._id}>
+                                    <td>
+                                        <Link to={`/users/${user._id}`}>
+                                            {user.name}
+                                        </Link>
+                                    </td>
+                                    <td>
+                                        {user.qualities.map((quality) => (
+                                            <span
+                                                className={`p-1 m-2 bg-${quality.color} text-white smallText `}
+                                                key={quality._id}
+                                            >
+                                                {quality.name}
+                                            </span>
+                                        ))}
+                                    </td>
+                                    <td>{user.profession.name}</td>
+                                    <td>{user.completedMeetings}</td>
+                                    <td>{user.rate}</td>
+                                    <td>
+                                        <FavoriteBtn />
+                                    </td>
+                                    <td>
+                                        <button
+                                            className="badge bg-danger"
+                                            onClick={() => onDelete(user._id)}
+                                        >
+                                            delete
+                                        </button>
+                                    </td>
+                                </tr>
+                            ))}
+                        </tbody>
+                    </table>
+                    <div className="d-flex justify-content-center">
+                        <Pagination
+                            itemsCount={count}
+                            pageSize={pageSize}
+                            currentPage={currentPage}
+                            onPageChange={handlePageChange}
+                        />
+                    </div>
                 </div>
+
             </div>
 
-        </div>
-
+        </>
     );
 };
 
