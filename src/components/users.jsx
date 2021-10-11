@@ -7,6 +7,7 @@ import { paginate } from "../utils/paginate";
 import GroupList from "./groupList";
 import _ from "lodash";
 import { Link } from "react-router-dom";
+import SearchForm from "./searchForm";
 const Users = () => {
     const [users, setUsers] = useState(api.users.fetchAll());
     const onDelete = (id) => {
@@ -52,9 +53,24 @@ const Users = () => {
             setSortBy({ iter: item, order: "asc" });
         }
     };
+    const filterPosts = (posts, query) => {
+        if (!query) {
+            return posts;
+        }
+
+        return posts.filter((post) => {
+            const postName = post.name.toLowerCase();
+            return postName.includes(query);
+        });
+    };
+    const posts = api.users.fetchAll();
+    const { search } = window.location;
+    const query = new URLSearchParams(search).get("search");
+    const [searchQuery, setSearchQuery] = useState(query || "");
+    const filteredPosts = filterPosts(posts, searchQuery);
+    console.log(searchQuery);
     return (
         <>
-
             <div className="d-flex">
                 {professions && (
                     <div className="d-flex flex-column flex-shrink-0 p-3">
@@ -67,7 +83,7 @@ const Users = () => {
                         <button className='btn btn-secondary mt-2'
                             onClick={clearFilter}
                         >
-                            Очистить фильр
+                            Очистить фильтр
                         </button>
                     </div>
                 )}
@@ -78,6 +94,12 @@ const Users = () => {
                             {users?.length ? `с тобой тусует ${filteredUsers.length}` : "никого нет"}
                         </span>
                     </h1>
+                    <div>
+                        <SearchForm
+                            searchQuery={searchQuery}
+                            setSearchQuery={setSearchQuery}
+                        />
+                    </div>
                     <table className="table">
 
                         <thead>
@@ -103,7 +125,39 @@ const Users = () => {
                         </thead>
 
                         <tbody>
-                            {userCrop.map((user) => (
+                            {searchQuery === "" ? userCrop.map((user) => (
+                                <tr key={user._id}>
+                                    <td>
+                                        <Link to={`/users/${user._id}`}>
+                                            {user.name}
+                                        </Link>
+                                    </td>
+                                    <td>
+                                        {user.qualities.map((quality) => (
+                                            <span
+                                                className={`p-1 m-2 bg-${quality.color} text-white smallText `}
+                                                key={quality._id}
+                                            >
+                                                {quality.name}
+                                            </span>
+                                        ))}
+                                    </td>
+                                    <td>{user.profession.name}</td>
+                                    <td>{user.completedMeetings}</td>
+                                    <td>{user.rate}</td>
+                                    <td>
+                                        <FavoriteBtn />
+                                    </td>
+                                    <td>
+                                        <button
+                                            className="badge bg-danger"
+                                            onClick={() => onDelete(user._id)}
+                                        >
+                                            delete
+                                        </button>
+                                    </td>
+                                </tr>
+                            )) : filteredPosts.map((user) => (
                                 <tr key={user._id}>
                                     <td>
                                         <Link to={`/users/${user._id}`}>
@@ -136,6 +190,7 @@ const Users = () => {
                                     </td>
                                 </tr>
                             ))}
+
                         </tbody>
                     </table>
                     <div className="d-flex justify-content-center">
