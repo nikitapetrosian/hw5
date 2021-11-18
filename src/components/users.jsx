@@ -10,6 +10,10 @@ import { Link } from "react-router-dom";
 import SearchForm from "./searchForm";
 const Users = () => {
     const [users, setUsers] = useState(api.users.fetchAll());
+    useEffect(() => {
+        const newUsers = JSON.parse(localStorage.getItem("users"));
+        setUsers(newUsers);
+    }, []);
     const onDelete = (id) => {
         const newArr = users.filter((user) => user._id !== id);
         setUsers(newArr);
@@ -68,7 +72,6 @@ const Users = () => {
     const query = new URLSearchParams(search).get("search");
     const [searchQuery, setSearchQuery] = useState(query || "");
     const filteredPosts = filterPosts(posts, searchQuery);
-    console.log(searchQuery);
     return (
         <>
             <div className="d-flex">

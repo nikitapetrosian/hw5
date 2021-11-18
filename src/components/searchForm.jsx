@@ -1,8 +1,5 @@
 import React from "react";
 import PropTypes from "prop-types";
-import api from "../api";
-// const posts = api.users.fetchAll()
-console.log(api.users.fetchAll());
 const SearchForm = ({ searchQuery, setSearchQuery }) => {
     return (
         <>
